@@ -33,7 +33,9 @@ def build_and_evaluate(rules, inputs_dict, X_test_clean, y_test, threshold=0.5):
     elapsed = (time.time() - t0) * 1000
 
     preds = [1 if r > threshold else 0 for r in raw]
-    return metrics(y_test, preds, elapsed)
+    m = metrics(y_test, preds, elapsed)
+    m['y_pred'] = preds
+    return m
 
 
 def run_fuzzy_experiments(X_test_clean, y_test):

@@ -40,6 +40,7 @@ def run_ml_experiments(X_train, X_test, y_train, y_test):
         elapsed = (time.time() - t0) * 1000
 
         ml_results[name] = metrics(y_test, preds, elapsed)
+        ml_results[name]['y_pred'] = list(preds)
 
     print("Modele Machine Learning przeliczone!\n")
     return ml_results

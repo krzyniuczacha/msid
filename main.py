@@ -119,3 +119,64 @@ bar_comparison(ax9, ml_res, 'f1', 'ML: F1-score')
 plt.savefig('fuzzy_experiments.png', dpi=130, bbox_inches='tight')
 plt.close()
 print("Gotowe! Wykres zapisano w pliku 'fuzzy_experiments.png'.")
+
+# === CONFUSION MATRICES =====
+from sklearn.metrics import confusion_matrix
+
+print("Generowanie confusion matrices...")
+
+cm_data = {
+    'Fuzzy: 1 atrybut\n(glukoza)':           exp1['1 atrybut\n(glukoza)'],
+    'Fuzzy: 2 atrybuty\n(glukoza+BMI)':      exp1['2 atrybuty\n(glukoza+BMI)'],
+    'Fuzzy: 3 atrybuty\n(glukoza+BMI+wiek)': exp1['3 atrybuty\n(glukoza+BMI+wiek)'],
+    'Fuzzy: 2 MF\n(binarne)':                exp2['2 MF\n(binarne)'],
+    'Fuzzy: 3 MF\n(bazowy)':                 exp2['3 MF\n(bazowy)'],
+    'Fuzzy: 4 MF\n(granularne)':             exp2['4 MF\n(granularne)'],
+    'Fuzzy: trimf':                           exp3['trimf'],
+    'Fuzzy: trapmf':                          exp3['trapmf'],
+    'Fuzzy: gaussmf':                         exp3['gaussmf'],
+    'ML: Logistic\nRegression':               ml_res['Logistic\nRegression'],
+    'ML: Decision\nTree':                     ml_res['Decision\nTree'],
+    'ML: Random\nForest':                     ml_res['Random\nForest'],
+}
+
+y_test_list = list(y_test)
+
+NCOLS = 6
+NROWS = 2
+fig_cm, axes_cm = plt.subplots(NROWS, NCOLS, figsize=(22, 8))
+fig_cm.suptitle('Confusion Matrices — systemy rozmyte i modele ML', fontsize=14, fontweight='bold', y=1.01)
+
+for idx, (name, res) in enumerate(cm_data.items()):
+    row, col = divmod(idx, NCOLS)
+    ax = axes_cm[row, col]
+
+    cm = confusion_matrix(y_test_list, res['y_pred'])
+    tn, fp, fn, tp = cm.ravel()
+
+    ax.imshow(cm, interpolation='nearest', cmap='Blues', vmin=0)
+
+    thresh = cm.max() / 2.0
+    cell_labels = ['TN', 'FP', 'FN', 'TP']
+    for i in range(2):
+        for j in range(2):
+            val = cm[i, j]
+            color = 'white' if val > thresh else '#1a1a2e'
+            label = cell_labels[i * 2 + j]
+            ax.text(j, i, f'{label}\n{val}', ha='center', va='center',
+                    fontsize=10, fontweight='bold', color=color)
+
+    ax.set_xticks([0, 1])
+    ax.set_yticks([0, 1])
+    ax.set_xticklabels(['Pred: 0', 'Pred: 1'], fontsize=8)
+    ax.set_yticklabels(['True: 0', 'True: 1'], fontsize=8)
+    ax.set_title(name, fontsize=9, fontweight='bold', pad=6)
+    ax.set_xlabel(f'Acc={res["accuracy"]:.3f}  F1={res["f1"]:.3f}', fontsize=8, labelpad=4)
+
+# Ukryj ostatnią pustą komórkę (12 slotów, 11 modeli)
+axes_cm[1, 5].set_visible(False)
+
+plt.tight_layout()
+plt.savefig('confusion_matrices.png', dpi=130, bbox_inches='tight')
+plt.close()
+print("Gotowe! Confusion matrices zapisano w pliku 'confusion_matrices.png'.")
