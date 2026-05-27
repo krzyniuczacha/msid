@@ -9,9 +9,7 @@ from ml_module import run_ml_experiments
 
 warnings.filterwarnings('ignore')
 
-# ==============================================
-# 1. PRZYGOTOWANIE DANYCH
-# ==============================================
+# PRZYGOTOWANIE DANYCH
 print("Wczytywanie i przygotowywanie danych...")
 df = pd.read_csv('diabetes.csv')
 
@@ -31,9 +29,7 @@ X_test_clean['Age_c'] = X_test_clean['Age'].clip(0, 80)
 
 print(f"Dane gotowe. Zbiór testowy: {len(X_test_clean)} pacjentów.\n")
 
-# ==============================================
-# 2. URUCHOMIENIE EKSPERYMENTÓW
-# ==============================================
+#URUCHOMIENIE EKSPERYMENTÓW
 # Zbieramy wyniki od systemu rozmytego
 exp1, exp2, exp3 = run_fuzzy_experiments(X_test_clean, y_test)
 
@@ -41,9 +37,7 @@ exp1, exp2, exp3 = run_fuzzy_experiments(X_test_clean, y_test)
 ml_res = run_ml_experiments(X_train, X_test, y_train, y_test)
 
 
-# ==============================================
-# 3. TABELA ZBIORCZA W KONSOLI
-# ==============================================
+#TABELA ZBIORCZA W KONSOLI
 print("=" * 70)
 print(f"{'System':<28} {'Acc':>7} {'Prec':>7} {'Recall':>7} {'F1':>7} {'ms':>8}")
 print("-" * 70)
@@ -68,9 +62,7 @@ for name, m in all_results.items():
 print("=" * 70)
 
 
-# ==============================================
-# 4. WIZUALIZACJA I ZAPIS WYKRESÓW
-# ==============================================
+#WIZUALIZACJA I ZAPIS WYKRESÓW
 print("\nGenerowanie wykresów...")
 
 PALETTE = ['#2196F3', '#FF9800', '#4CAF50', '#E91E63', '#9C27B0']
