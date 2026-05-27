@@ -82,7 +82,7 @@ def bar_comparison(ax, results, metric, title, colors=None):
     ax.tick_params(axis='x', labelsize=8)
 
 fig = plt.figure(figsize=(20, 16))
-fig.suptitle('Wyniki eksperymentów — system rozmyty i metody ML', fontsize=15, fontweight='bold', y=0.98)
+fig.suptitle('Wyniki eksperymentów - system rozmyty i metody ML', fontsize=15, fontweight='bold', y=0.98)
 gs = gridspec.GridSpec(3, 3, figure=fig, hspace=0.55, wspace=0.35)
 
 # Wiersz 1
@@ -145,7 +145,7 @@ y_test_list = list(y_test)
 NCOLS = 6
 NROWS = 2
 fig_cm, axes_cm = plt.subplots(NROWS, NCOLS, figsize=(22, 8))
-fig_cm.suptitle('Confusion Matrices — systemy rozmyte i modele ML', fontsize=14, fontweight='bold', y=1.01)
+fig_cm.suptitle('Confusion Matrices - systemy rozmyte i modele ML', fontsize=14, fontweight='bold', y=1.01)
 
 for idx, (name, res) in enumerate(cm_data.items()):
     row, col = divmod(idx, NCOLS)
