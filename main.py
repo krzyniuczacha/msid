@@ -1,5 +1,6 @@
 import warnings
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from sklearn.model_selection import train_test_split
@@ -35,31 +36,31 @@ exp1, exp2, exp3 = run_fuzzy_experiments(X_test_clean, y_test)
 
 # Zbieramy wyniki od uczenia maszynowego
 ml_res = run_ml_experiments(X_train, X_test, y_train, y_test)
-
+feature_importances_dict = ml_res.pop('feature_importances', {})
 
 #TABELA ZBIORCZA W KONSOLI
-print("=" * 70)
-print(f"{'System':<28} {'Acc':>7} {'Prec':>7} {'Recall':>7} {'F1':>7} {'ms':>8}")
-print("-" * 70)
+print("=" * 78)
+print(f"{'System':<28} {'Acc':>7} {'Prec':>7} {'Recall':>7} {'F1':>7} {'AUC':>7} {'ms':>8}")
+print("-" * 78)
 
 all_results = {
-    '── FUZZY: 1 atrybut':       exp1['1 atrybut\n(glukoza)'],
-    '── FUZZY: 2 atrybuty':      exp1['2 atrybuty\n(glukoza+BMI)'],
-    '── FUZZY: 3 atrybuty':      exp1['3 atrybuty\n(glukoza+BMI+wiek)'],
-    '── FUZZY: 2 MF':            exp2['2 MF\n(binarne)'],
-    '── FUZZY: 4 MF':            exp2['4 MF\n(granularne)'],
-    '── FUZZY: trimf':           exp3['trimf'],
-    '── FUZZY: trapmf':          exp3['trapmf'],
-    '── FUZZY: gaussmf':         exp3['gaussmf'],
-    '── ML: Logistic Regression':ml_res['Logistic\nRegression'],
-    '── ML: Decision Tree':      ml_res['Decision\nTree'],
-    '── ML: Random Forest':      ml_res['Random\nForest'],
+    '-- FUZZY: 1 atrybut':       exp1['1 atrybut\n(glukoza)'],
+    '-- FUZZY: 2 atrybuty':      exp1['2 atrybuty\n(glukoza+BMI)'],
+    '-- FUZZY: 3 atrybuty':      exp1['3 atrybuty\n(glukoza+BMI+wiek)'],
+    '-- FUZZY: 2 MF':            exp2['2 MF\n(binarne)'],
+    '-- FUZZY: 4 MF':            exp2['4 MF\n(granularne)'],
+    '-- FUZZY: trimf':           exp3['trimf'],
+    '-- FUZZY: trapmf':          exp3['trapmf'],
+    '-- FUZZY: gaussmf':         exp3['gaussmf'],
+    '-- ML: Logistic Regression':ml_res['Logistic\nRegression'],
+    '-- ML: Decision Tree':      ml_res['Decision\nTree'],
+    '-- ML: Random Forest':      ml_res['Random\nForest'],
 }
 
 for name, m in all_results.items():
     print(f"{name:<28} {m['accuracy']:>7.3f} {m['precision']:>7.3f} "
-          f"{m['recall']:>7.3f} {m['f1']:>7.3f} {m['time_ms']:>8.1f}")
-print("=" * 70)
+          f"{m['recall']:>7.3f} {m['f1']:>7.3f} {m['auc']:>7.3f} {m['time_ms']:>8.1f}")
+print("=" * 78)
 
 
 #WIZUALIZACJA I ZAPIS WYKRESÓW
@@ -180,3 +181,48 @@ plt.tight_layout()
 plt.savefig('confusion_matrices.png', dpi=130, bbox_inches='tight')
 plt.close()
 print("Gotowe! Confusion matrices zapisano w pliku 'confusion_matrices.png'.")
+
+# === ROC CURVES =====
+from sklearn.metrics import roc_curve
+print("Generowanie krzywych ROC...")
+
+plt.figure(figsize=(10, 8))
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+
+# Wybór najlepszych modeli do ROC
+roc_models = {
+    'Fuzzy: 3 atrybuty': exp1['3 atrybuty\n(glukoza+BMI+wiek)'],
+    'Fuzzy: Gauss MF': exp3['gaussmf'],
+    'ML: Logistic Reg': ml_res['Logistic\nRegression'],
+    'ML: Random Forest': ml_res['Random\nForest']
+}
+
+for name, res in roc_models.items():
+    fpr, tpr, _ = roc_curve(y_test_list, res['y_prob'])
+    auc_score = res['auc']
+    plt.plot(fpr, tpr, lw=2, label=f'{name} (AUC = {auc_score:.3f})')
+
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Krzywe ROC (Receiver Operating Characteristic)', fontweight='bold')
+plt.legend(loc="lower right")
+plt.savefig('roc_curve.png', dpi=130, bbox_inches='tight')
+plt.close()
+print("Gotowe! Krzywe ROC zapisano w pliku 'roc_curve.png'.")
+
+# === FEATURE IMPORTANCES =====
+print("Generowanie wykresu Feature Importances...")
+rf_importances = feature_importances_dict.get('Random\nForest')
+if rf_importances is not None:
+    plt.figure(figsize=(10, 6))
+    features = X_train.columns
+    indices = np.argsort(rf_importances)
+    plt.barh(range(len(indices)), rf_importances[indices], color='#4CAF50', align='center')
+    plt.yticks(range(len(indices)), [features[i] for i in indices])
+    plt.xlabel('Relative Importance')
+    plt.title('Ważność cech wg algorytmu Random Forest', fontweight='bold')
+    plt.savefig('feature_importance.png', dpi=130, bbox_inches='tight')
+    plt.close()
+    print("Gotowe! Feature importances zapisano w pliku 'feature_importance.png'.")

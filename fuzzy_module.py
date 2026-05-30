@@ -2,15 +2,16 @@ import time
 import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 
-def metrics(y_true, y_pred, elapsed_ms):
+def metrics(y_true, y_pred, y_prob, elapsed_ms):
     return {
         'accuracy': accuracy_score(y_true, y_pred),
         'precision': precision_score(y_true, y_pred, zero_division=0),
         'recall': recall_score(y_true, y_pred, zero_division=0),
         'f1': f1_score(y_true, y_pred, zero_division=0),
+        'auc': roc_auc_score(y_true, y_prob),
         'time_ms': elapsed_ms,
     }
 
@@ -33,8 +34,9 @@ def build_and_evaluate(rules, inputs_dict, X_test_clean, y_test, threshold=0.5):
     elapsed = (time.time() - t0) * 1000
 
     preds = [1 if r > threshold else 0 for r in raw]
-    m = metrics(y_test, preds, elapsed)
+    m = metrics(y_test, preds, raw, elapsed)
     m['y_pred'] = preds
+    m['y_prob'] = raw
     return m
 
 
