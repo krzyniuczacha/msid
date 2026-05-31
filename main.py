@@ -121,6 +121,43 @@ plt.savefig('fuzzy_experiments.png', dpi=130, bbox_inches='tight')
 plt.close()
 print("Gotowe! Wykres zapisano w pliku 'fuzzy_experiments.png'.")
 
+# === OSOBNE WYKRESY DLA KAŻDEGO EKSPERYMENTU ===
+print("Generowanie osobnych wykresów dla każdego eksperymentu...")
+# Exp 1
+fig1 = plt.figure(figsize=(15, 5))
+fig1.suptitle('Eksperyment 1: Liczba atrybutów', fontsize=14, fontweight='bold', y=1.05)
+gs1 = gridspec.GridSpec(1, 3, figure=fig1, wspace=0.3)
+bar_comparison(fig1.add_subplot(gs1[0, 0]), exp1, 'accuracy', 'Dokładność')
+bar_comparison(fig1.add_subplot(gs1[0, 1]), exp1, 'f1', 'F1-score')
+ax_time1 = fig1.add_subplot(gs1[0, 2])
+ax_time1.bar(names1, times1, color=PALETTE[:len(names1)], edgecolor='white')
+ax_time1.set_title('Czas klasyfikacji [ms]', fontsize=11, fontweight='bold')
+ax_time1.set_ylabel('Czas [ms]')
+ax_time1.spines[['top', 'right']].set_visible(False)
+ax_time1.tick_params(axis='x', labelsize=8)
+plt.savefig('fuzzy_exp1.png', dpi=130, bbox_inches='tight')
+plt.close()
+
+# Exp 2
+fig2 = plt.figure(figsize=(10, 5))
+fig2.suptitle('Eksperyment 2: Liczba funkcji przynależności (MF)', fontsize=14, fontweight='bold', y=1.05)
+gs2 = gridspec.GridSpec(1, 2, figure=fig2, wspace=0.3)
+bar_comparison(fig2.add_subplot(gs2[0, 0]), exp2, 'accuracy', 'Dokładność')
+bar_comparison(fig2.add_subplot(gs2[0, 1]), exp2, 'f1', 'F1-score')
+plt.savefig('fuzzy_exp2.png', dpi=130, bbox_inches='tight')
+plt.close()
+
+# Exp 3
+fig3 = plt.figure(figsize=(10, 5))
+fig3.suptitle('Eksperyment 3: Typ funkcji przynależności', fontsize=14, fontweight='bold', y=1.05)
+gs3 = gridspec.GridSpec(1, 2, figure=fig3, wspace=0.3)
+bar_comparison(fig3.add_subplot(gs3[0, 0]), exp3, 'accuracy', 'Dokładność', colors=['#2196F3', '#FF5722', '#009688'])
+bar_comparison(fig3.add_subplot(gs3[0, 1]), exp3, 'f1', 'F1-score', colors=['#2196F3', '#FF5722', '#009688'])
+plt.savefig('fuzzy_exp3.png', dpi=130, bbox_inches='tight')
+plt.close()
+
+print("Gotowe! Osobne wykresy zapisano jako 'fuzzy_exp1.png', 'fuzzy_exp2.png', 'fuzzy_exp3.png'.")
+
 # === CONFUSION MATRICES =====
 from sklearn.metrics import confusion_matrix
 
@@ -174,8 +211,6 @@ for idx, (name, res) in enumerate(cm_data.items()):
     ax.set_title(name, fontsize=9, fontweight='bold', pad=6)
     ax.set_xlabel(f'Acc={res["accuracy"]:.3f}  F1={res["f1"]:.3f}', fontsize=8, labelpad=4)
 
-# Ukryj ostatnią pustą komórkę (12 slotów, 11 modeli)
-axes_cm[1, 5].set_visible(False)
 
 plt.tight_layout()
 plt.savefig('confusion_matrices.png', dpi=130, bbox_inches='tight')
