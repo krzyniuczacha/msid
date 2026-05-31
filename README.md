@@ -30,13 +30,6 @@ Three reference models were trained on the identical dataset partition:
 * **Decision Tree Classifier** (tuned with `max_depth=5`)
 * **Random Forest Classifier** (ensemble of 100 estimators)
 
-## Evaluation and Results
-Each configuration is evaluated using standard classification metrics: **Accuracy, Precision, Recall, and F1-score**, along with the **inference execution time (ms)**.
-
-The main execution script outputs a structured terminal summary table and automatically exports comprehensive evaluation charts:
-* `fuzzy_experiments.png`: Bar chart comparison of accuracy, F1-score, and computational times.
-* `confusion_matrices.png`: A comprehensive grid layout displaying confusion matrices for all 11 evaluated fuzzy configurations and ML models.
-
 ## Technologies Used
 * **Language:** Python
 * **Data Analysis & ML:** `pandas`, `numpy`, `scikit-learn`
